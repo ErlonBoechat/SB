@@ -1,0 +1,34 @@
+# 🔹 Ignorar arquivos do RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Rapp.history
+
+# 🔹 Ignorar configurações pessoais do RStudio
+.Rproj
+*.Rproj
+
+# 🔹 Ignorar arquivos temporários
+*.tmp
+*.log
+*.bak
+*.swp
+
+# 🔹 Ignorar dados brutos e processados (caso não queira versionar)
+data/
+output/
+
+# 🔹 Ignorar pacotes instalados localmente (caso use `renv`)
+renv/
+renv.lock
+
+# 🔹 Ignorar cache do sistema
+.DS_Store  # macOS
+Thumbs.db  # Windows
+
+# 🔹 Ignorar arquivos exportados (CSV, gráficos, relatórios)
+*.csv
+*.png
+*.pdf
+*.html
