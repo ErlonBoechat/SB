@@ -6,7 +6,7 @@ source("visualizations.R")
 source("export.R")
 
 # Definir caminho do arquivo de entrada
-file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem19.txt"
+file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem1.txt"
 
 # Processar os dados
 processor <- DataProcessor$new(file_path)
@@ -35,3 +35,4 @@ exporter$export_to_excel()
 exporter$export_to_rds()
 
 message("Processamento concluído com sucesso!")
+

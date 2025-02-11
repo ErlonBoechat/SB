@@ -16,7 +16,7 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                
                                read_data = function(file_path) {
                                  
-                                 raw_lines <- read_lines(file_path) # Lê todas as linhas do arquivo .txt e as armazena em raw_lines
+                                 raw_lines <- read_lines(file_path) 
                                  
                                  # Quatro variáveis temporárias
                                  profiles <- list() # Lista para armazenar os perfis
@@ -24,7 +24,7 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  current_data <- list() # Dicionário para armazenar os dados do perfil
                                  current_datetime <- NULL # Variável para armazenar a data/hora da raspagem
                                  
-                                 for (line in raw_lines) {
+                                 for (line in raw_lines) { # percorre cada linha do arquivo identificando se é uma data, um perfil ou uma métrica
                                    line <- trimws(line)
                                    
                                    # Detecta a Data e Hora da coleta
@@ -66,6 +66,8 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                             }
                                         }
                                    }
+                            
+                                   
                                  }
                                  
                                  if (!is.null(current_profile)) {
