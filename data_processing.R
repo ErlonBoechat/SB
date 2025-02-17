@@ -31,18 +31,6 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  }
                                  
                                  
-                                 # Filtrar linhas para remover caracteres irrelevantes antes do primeiro perfil
-                                 # Remover caracteres invisíveis antes do @
-                                 
-                                 profile_raw_lines <- gsub("^[^@]*", "", raw_lines)
-                                 
-                                 # Filtrar apenas as linhas que começam com @
-                                 profile_names <- profile_raw_lines[grepl("^@", profile_raw_lines)]
-                                 
-                                 # Contar a quantidade total de perfis
-                                 num_profiles <- length(profile_names)
-                                 
-                                 
                                  print(paste("Perfis identificados:", num_profiles))
                                  print(profile_names)
                                  
