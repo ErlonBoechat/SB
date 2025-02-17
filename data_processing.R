@@ -1,9 +1,10 @@
 library(tidyverse)
 library(readr)
 library(lubridate)
+library(R6)
 
 # Classe para processar os dados da raspagem
-DataProcessor <- R6::R6Class("DataProcessor", 
+DataProcessor <- R6::R6Class("DataProcessor",
                              public = list(
                                data = NULL,
                                
@@ -15,8 +16,20 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                },
                                
                                read_data = function(file_path) {
-                                 raw_lines <- read_lines(file_path) 
+                                 raw_lines <- read_lines(file_path)
                                  raw_lines <- trimws(raw_lines)  # Remove espaços extras
+                                 
+                                 # Criar um vetor com os nomes dos perfis
+                                 profile_names <- gsub("^[^@]*", "", raw_lines)
+                                 # Filtrar apenas as linhas que começam com @
+                                 profile_names <- profile_raw_lines[grepl("^@", profile_raw_lines)]
+                                 # Contar a quantidade total de perfis
+                                 num_profiles <- length(profile_names)
+                                 
+                                 if (num_profiles == 0) {
+                                   stop("Erro: Nenhum perfil identificado no arquivo. Verifique o formato.")
+                                 }
+                                 
                                  
                                  # Filtrar linhas para remover caracteres irrelevantes antes do primeiro perfil
                                  # Remover caracteres invisíveis antes do @
@@ -29,84 +42,52 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  # Contar a quantidade total de perfis
                                  num_profiles <- length(profile_names)
                                  
-                                 # Identificar o primeiro perfil corretamente
-                                 start_index <- which(grepl("^@", profile_raw_lines))[1]
                                  
-                                 if (is.na(start_index)) {
-                                   stop("Erro: Nenhum perfil identificado após limpeza. Verifique o formato.")
-                                 }
+                                 print(paste("Perfis identificados:", num_profiles))
+                                 print(profile_names)
                                  
-                                 # Manter apenas os dados após o primeiro perfil
-                                 raw_lines <- raw_lines[start_index:length(raw_lines)]
-
+                                 # Lista das métricas esperadas
+                                 metric_names <- c("Media Uploads", "Followers", "Following", "Engagement Rate", 
+                                                   "AVG Likes", "AVG Comments")
                                  
-                                 # Variáveis temporárias para armazenar os perfis
-                                 profiles <- list()
-                                 current_profile <- NULL
-                                 current_data <- list()
-                                 current_datetime <- NULL
-                                 metric_key <- NULL
+                                 # Criar estrutura para armazenar os dados processados
+                                 profiles_data <- list()
                                  
-                                 print("Lendo o arquivo...")
-                                 print(head(raw_lines, 1000))  # Exibe as 20 primeiras linhas
+                                 # Definir a posição inicial da primeira métrica
+                                 first_metric_position <- 5  # Linha onde começam as métricas do primeiro perfil
+                                 r <- 47  # Razão fixa de espaçamento entre perfis
                                  
-                                 for (line in raw_lines) {  
-                                   line <- trimws(line)
+                                 # Iterar sobre cada perfil identificado
+                                 for (i in 1:num_profiles) {
+                                   start_index <- first_metric_position + (i - 1) * r  # Posição inicial das métricas do perfil atual
                                    
-                                   # Detecta a Data e Hora da coleta
-                                   if (grepl("^[0-9]{2}:[0-9]{2} [0-9]{2}/[0-9]{2}/[0-9]{4}$", line)) {
-                                     if (!is.null(current_profile)) {
-                                       profiles[[current_profile]] <- rbind(profiles[[current_profile]], as.data.frame(current_data, stringsAsFactors = FALSE))
-                                     }
-                                     current_datetime <- line
-                                     current_profile <- NULL
-                                     current_data <- list()
-                                   }
+                                   profile_data <- list(Perfil = profile_names[i])  # Criar estrutura para armazenar dados do perfil
                                    
-                                   # Detecta o nome do perfil
-                                   else if (nzchar(line) && grepl("^@", line)) {
+                                   # Iterar sobre as métricas e armazenar os valores no perfil correspondente
+                                   for (j in 1:length(metric_names)) {
+                                     metric_index <- start_index + (j - 1) * 2  # Cada métrica está separada por 2 linhas
                                      
-                                     if (!is.null(current_profile)) {
-                                       profiles[[current_profile]] <- rbind(profiles[[current_profile]], as.data.frame(current_data, stringsAsFactors = FALSE))
+                                     # Verificar se a linha existe antes de tentar acessá-la
+                                     if (metric_index <= length(raw_lines)) {
+                                       value <- gsub("[^0-9.-]", "", raw_lines[metric_index])  # Extrair números
+                                       profile_data[[metric_names[j]]] <- as.numeric(value)  # Converter para número
+                                     } else {
+                                       profile_data[[metric_names[j]]] <- NA  # Evitar erro caso a linha não exista
                                      }
-                                     current_profile <- line
-                                     current_data <- list(DataHora = current_datetime, Perfil = current_profile)
                                    }
                                    
-                                   # Mapeia as métricas
-                                   else {
-                                     metric_names <- c("Media Uploads", "Followers", "Following", "Engagement Rate", "AVG Likes", "AVG Comments", 
-                                                       "Followers Rank", "Following Rank", "Engagement Rank", "Media Rank", 
-                                                       "Followers for the last 30 days", "Following for the last 30 days", "Media for the last 30 days")
-                                     
-                                     if (line %in% metric_names) {
-                                       metric_key <- line
-                                     } 
-                                     else {
-                                       value <- gsub("[^0-9.-]", "", line)
-                                       value <- as.numeric(value)
-                                       
-                                       if (!is.na(value) && !is.null(metric_key)) {
-                                         current_data[[metric_key]] <- value
-                                       }
-                                     }
-                                   }
+                                   # Armazena os dados do perfil na lista final
+                                   profiles_data[[profile_names[i]]] <- profile_data
                                  }
                                  
-                                 if (!is.null(current_profile)) {
-                                   profiles[[current_profile]] <- rbind(profiles[[current_profile]], as.data.frame(current_data, stringsAsFactors = FALSE))
-                                 }
-                                 
-                                 final_data <- do.call(rbind, profiles)
+                                 # Converter a lista para um dataframe final
+                                 final_data <- do.call(rbind, lapply(profiles_data, as.data.frame))
                                  
                                  if (is.null(final_data) || nrow(final_data) == 0) {
                                    stop("Erro: Nenhum dado foi extraído do arquivo ", file_path)
                                  }
                                  
-                                 print("Dados processados antes de transformar em dataframe:")
-                                 print(profiles)
                                  return(final_data)
-                               } 
-
-  )
+                               }
+                             )
 )
