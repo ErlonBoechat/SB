@@ -6,19 +6,30 @@ source("visualizations.R")
 source("export.R")
 
 # Definir caminho do arquivo de entrada
-file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem20.txt"
+file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem21.txt"
 
 # Processar os dados
 processor <- DataProcessor$new(file_path)
 
 df_dados <- as.data.frame(processor$data)
 
+file_path <- NULL
 processor <- NULL
 df_dados <- NULL
 dados <- NULL
 raw_lines <- NULL
+current_datetime <- NULL
+current_profile <- NULL
 profile_names <- NULL
-
+line <- NULL
+metric_key <- NULL
+metric_names <- NULL
+metricas_linhas <- NULL
+raw_lines_clean <- NULL
+start_index <- NULL
+profile_raw_lines <- NULL
+peofile_Raw_lines <- NULL
+num_profiles <- NULL
 
 dados <- processor$data
 

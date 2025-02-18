@@ -22,13 +22,25 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  # Criar um vetor com os nomes dos perfis
                                  profile_names <- gsub("^[^@]*", "", raw_lines)
                                  # Filtrar apenas as linhas que começam com @
-                                 profile_names <- profile_raw_lines[grepl("^@", profile_raw_lines)]
+                              #   profile_names <- profile_names[grepl("^@", profile_names)]
                                  # Contar a quantidade total de perfis
                                  num_profiles <- length(profile_names)
                                  
                                  if (num_profiles == 0) {
                                    stop("Erro: Nenhum perfil identificado no arquivo. Verifique o formato.")
                                  }
+                                 
+                                 
+                                 # Filtrar linhas para remover caracteres irrelevantes antes do primeiro perfil
+                                 # Remover caracteres invisíveis antes do @
+                                 
+                                 profile_raw_lines <- gsub("^[^@]*", "", raw_lines)
+                                 
+                                 # Filtrar apenas as linhas que começam com @
+                                 profile_names <- profile_raw_lines[grepl("^@", profile_raw_lines)]
+                                 
+                                 # Contar a quantidade total de perfis
+                                 num_profiles <- length(profile_names)
                                  
                                  
                                  print(paste("Perfis identificados:", num_profiles))
