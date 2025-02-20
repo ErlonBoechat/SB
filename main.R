@@ -6,12 +6,13 @@ source("visualizations.R")
 source("export.R")
 
 # Definir caminho do arquivo de entrada
-file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem22.txt"
-
-# Processar os dados
+file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem25.txt"
 processor <- DataProcessor$new(file_path)
-
 df_dados <- as.data.frame(processor$data)
+df_dados
+
+rm()
+rm(list=ls())
 
 file_path <- NULL
 processor <- NULL
