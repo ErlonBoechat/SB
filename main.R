@@ -1,3 +1,4 @@
+library(dplyr)
 library(tidyverse)
 library(R6)
 source("data_processing.R")
@@ -8,10 +9,31 @@ source("export.R")
 # Definir caminho do arquivo de entrada
 file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem25.txt"
 processor <- DataProcessor$new(file_path)
-df_dados <- as.data.frame(processor$data)
-df_dados
+dados <- processor$data
+dados <- dados %>%
+  mutate(Total_Engajamento = rowSums(select(., AVG.Likes, AVG.Comments), na.rm = TRUE))
 
-rm()
+dados <- dados %>%
+  arrange(desc(Total_Engajamento))
+
+dados
+
+colunas_desejadas <- dados %>%
+  select(Perfil, Followers, Engagement.Rate, Total_Engajamento)
+
+dados <- dados[, -1]
+
+rk_followers <- dados %>%
+  arrange(desc(Followers))
+
+rk_avgLikes <- dados %>%
+  arrange(desc(AVG.Likes))
+
+dados <- dados %>%
+  mutate(Total_Engajamento = rowSums(select(., AVG.Likes, AVG.Comments), na.rm = TRUE))
+
+rm(file_path,processor,dados,dados,raw_lines,current_datetime,current_profile,profile_names,line)
+rm(final_data,profile_data,profiles_data)
 rm(list=ls())
 
 file_path <- NULL
@@ -33,12 +55,6 @@ peofile_Raw_lines <- NULL
 num_profiles <- NULL
 
 dados <- processor$data
-
-df_dados <- as.data.frame(dados)
-
-plot(df_dados$Perfil,df_dados$Media.Uploads)
-
-help(plot)
 
 # Calcular métricas
 calculator <- MetricsCalculator$new(dados)
