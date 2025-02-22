@@ -24,7 +24,8 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  
                                  # Filtrar apenas as linhas que começam com @
                                  profile_names <- profile_raw_lines[grepl("^@", profile_raw_lines)]
-                                 
+                                 rm(profile_raw_lines)
+
                                  # Contar a quantidade total de perfis
                                  num_profiles <- length(profile_names)
                                  
@@ -32,42 +33,36 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                    stop("Erro: Nenhum perfil identificado no arquivo. Verifique o formato.")
                                   }
                                  
-                                 
                                  print(paste("Perfis identificados:", num_profiles))
-                                 print(profile_names)
                                  
                                  # Lista das métricas esperadas
                                  metric_names <- c("Media Uploads", "Followers", "Following", "Engagement Rate", 
                                                    "AVG Likes", "AVG Comments")
                                  
-                                 # Criar estrutura para armazenar os dados processados
-                                 profiles_data <- list()
-                                 
-                                 # Definir a posição inicial da primeira métrica
+                                 profile_data <- list() # Criar estrutura para armazenar dados do perfil
+                                 profiles_data <- list()# Criar estrutura para armazenar os dados processados
+
                                  first_metric_position <- 5  # Linha onde começam as métricas do primeiro perfil
                                  r <- 47  # Razão fixa de espaçamento entre perfis
                                  
-                                 # Iterar sobre cada perfil identificado
-                                 for (i in 1:num_profiles) {
+                                 for (i in 1:num_profiles) {  # Iterar sobre cada perfil identificado
                                    start_index <- first_metric_position + (i - 1) * r  # Posição inicial das métricas do perfil atual
-                                   
-                                   profile_data <- list(Perfil = profile_names[i])  # Criar estrutura para armazenar dados do perfil
-                                   
-                                   # Iterar sobre as métricas e armazenar os valores no perfil correspondente
-                                   for (j in 1:length(metric_names)) {
-                                     metric_index <- start_index + (j - 1) * 2  # Cada métrica está separada por 2 linhas
+
+                                   for (j in 1:length(metric_names)) { # Iterar sobre as métricas e armazenar os valores no perfil correspondente
+                                      metric_index <- start_index + (j - 1) * 2  # Cada métrica está separada por 2 linhas
                                      
-                                     # Verificar se a linha existe antes de tentar acessá-la
-                                     if (metric_index <= length(raw_lines)) {
-                                       value <- gsub("[^0-9.-]", "", raw_lines[metric_index])  # Extrair números
-                                       profile_data[[metric_names[j]]] <- as.numeric(value)  # Converter para número
-                                     } else {
-                                       profile_data[[metric_names[j]]] <- NA  # Evitar erro caso a linha não exista
-                                     }
+                                      if (metric_index <= length(raw_lines)) { # Verificar se a linha existe antes de tentar acessá-la
+                                         value <- gsub("[^0-9.-]", "", raw_lines[metric_index])  # Extrair números
+                                         profile_data[[metric_names[j]]] <- as.numeric(value)  # Converter para número
+                                      } 
+                                      
+                                      else {
+                                      
+                                         profile_data[[metric_names[j]]] <- NA  # Evitar erro caso a linha não exista
+                                      }
                                    }
                                    
-                                   # Armazena os dados do perfil na lista final
-                                   profiles_data[[profile_names[i]]] <- profile_data
+                                     profiles_data[[Perfil = profile_names[i]]] <- profile_data # Armazena os dados do perfil na lista final
                                  }
                                  
                                  # Converter a lista para um dataframe final

@@ -7,21 +7,24 @@ source("visualizations.R")
 source("export.R")
 
 # Definir caminho do arquivo de entrada
-file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem25.txt"
+file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem27.txt"
 processor <- DataProcessor$new(file_path)
 dados <- processor$data
 dados <- dados %>%
-  mutate(Total_Engajamento = rowSums(select(., AVG.Likes, AVG.Comments), na.rm = TRUE))
+  mutate(SUM.AVG.Engajament = rowSums(select(., AVG.Likes, AVG.Comments), na.rm = TRUE))
 
 dados <- dados %>%
-  arrange(desc(Total_Engajamento))
+  arrange(desc(SUM.AVG.Engajament))
 
 dados
 
 colunas_desejadas <- dados %>%
-  select(Perfil, Followers, Engagement.Rate, Total_Engajamento)
+  select(Followers, Engagement.Rate,AVG.Likes, AVG.Comments,SUM.AVG.Engajament)
 
 dados <- dados[, -1]
+
+rk_engagement <- dados %>%
+  arrange(desc(Engagement.Rate))
 
 rk_followers <- dados %>%
   arrange(desc(Followers))
@@ -29,32 +32,18 @@ rk_followers <- dados %>%
 rk_avgLikes <- dados %>%
   arrange(desc(AVG.Likes))
 
+rk_avgComments <- colunas_desejadas %>%
+  arrange(desc(AVG.Comments))
+
+rk_media <- dados %>%
+  arrange(desc(Media.Uploads))
+
 dados <- dados %>%
-  mutate(Total_Engajamento = rowSums(select(., AVG.Likes, AVG.Comments), na.rm = TRUE))
+  mutate(SUM.AVG.Engajament = rowSums(select(., AVG.Likes, AVG.Comments), na.rm = TRUE))
 
 rm(file_path,processor,dados,dados,raw_lines,current_datetime,current_profile,profile_names,line)
 rm(final_data,profile_data,profiles_data)
 rm(list=ls())
-
-file_path <- NULL
-processor <- NULL
-df_dados <- NULL
-dados <- NULL
-raw_lines <- NULL
-current_datetime <- NULL
-current_profile <- NULL
-profile_names <- NULL
-line <- NULL
-metric_key <- NULL
-metric_names <- NULL
-metricas_linhas <- NULL
-raw_lines_clean <- NULL
-start_index <- NULL
-profile_raw_lines <- NULL
-peofile_Raw_lines <- NULL
-num_profiles <- NULL
-
-dados <- processor$data
 
 # Calcular métricas
 calculator <- MetricsCalculator$new(dados)
