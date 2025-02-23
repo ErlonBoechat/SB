@@ -1,4 +1,5 @@
 library(tidyverse)
+library(dplyr)
 library(readr)
 library(lubridate)
 library(R6)
@@ -43,6 +44,7 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  print(paste("Perfis identificados:", num_profiles))
                                  
                                  current_datetime <- data.frame(Date.Time = rep(current_datetime, num_profiles))
+                                 current_source <- data.frame(Media.Source = rep("Instagram", num_profiles))
                                  
                                  # Lista das métricas esperadas
                                  metric_names <- c("Media Uploads", "Followers", "Following", "Engagement Rate", 
@@ -73,7 +75,9 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  
                                  # Converter a lista para um dataframe final
                                  final_data <- do.call(rbind, lapply(profiles_data, as.data.frame))
+                                 final_data <- cbind(Media.Source = current_source, final_data)
                                  final_data <- cbind(Date.Time = current_datetime, final_data)
+                                 
 
                                  if (is.null(final_data) || nrow(final_data) == 0) {
                                    stop("Erro: Nenhum dado foi extraído do arquivo ", file_path)
