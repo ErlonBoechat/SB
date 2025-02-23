@@ -74,9 +74,11 @@ DataProcessor <- R6::R6Class("DataProcessor",
                                  }
                                  
                                  # Converter a lista para um dataframe final
-                                 final_data <- do.call(rbind, lapply(profiles_data, as.data.frame))
-                                 final_data <- cbind(Media.Source = current_source, final_data)
-                                 final_data <- cbind(Date.Time = current_datetime, final_data)
+                                 final_data <- profiles_data %>%
+                                   lapply(as.data.frame) %>%
+                                   do.call(rbind, .) %>%
+                                   cbind(Media.Source = current_source, .) %>%
+                                   cbind(Date.Time = current_datetime, .)
                                  
 
                                  if (is.null(final_data) || nrow(final_data) == 0) {
