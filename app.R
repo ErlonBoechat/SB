@@ -32,21 +32,21 @@ ui <- fluidPage(
         tabPanel("Variações Percentuais", tableOutput("variations"))
       )
     )
-  )
-)
+  )               #  final_data
+) 
 
 server <- function(input, output, session) {
   
   data <- reactiveVal()
   
   observeEvent(input$process, {
-    req(final_data)
+    req(tabela)
     
-    calculator <- MetricsCalculator$new(final_data)
+    calculator <- MetricsCalculator$new(tabela)
     data(list(
-      dados = final_data,
+      dados = tabela,
       medias = calculator$calcular_medias(),
-      variacoes = calculator$calcular_variacoes()
+     # variacoes = calculator$calcular_variacoes()
     ))
   })
   
@@ -55,7 +55,8 @@ server <- function(input, output, session) {
     data()$medias
   })
   
-  output$variations <- renderTable({
+ 
+   output$variations <- renderTable({
     req(data())
     data()$variacoes
   })
@@ -103,14 +104,14 @@ server <- function(input, output, session) {
   )
   
   observeEvent(input$process, {
-    req(final_data)
+    req(tabela)
     
     # Exibir os nomes das colunas no console
-    print(colnames(final_data))
+    print(colnames(tabela))
     
-    calculator <- MetricsCalculator$new(final_data)
+    calculator <- MetricsCalculator$new(tabela)
     data(list(
-      dados = final_data,
+      dados = tabela,
       medias = calculator$calcular_medias(),
       variacoes = calculator$calcular_variacoes()
     ))

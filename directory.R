@@ -52,12 +52,6 @@ final_data <- dplyr::bind_rows(data_list)
 # Desloca a coluna Perfil para a esquerda do dataframe
 final_data <- final_data %>% select(Perfil, everything())
 
-date <- final_data$Date.Time
-
-
-final_data <- final_data %>%
-  mutate(Date.Time = dmy_hm(Date.Time))
-
 gera_tabela_medias <- function(final_data) {
   # Converter a coluna Date.Time para objeto de data/hora
 
@@ -85,6 +79,16 @@ gera_tabela_medias <- function(final_data) {
 # Exemplo de uso:
 tabela_medias <- gera_tabela_medias(final_data)
 print(tabela_medias)
+
+
+tabela_medias <- tabela_medias %>%
+  arrange(desc(Engagement.Rate))
+
+
+print(tabela_medias, n = Inf)
+
+
+
 
 df_tabela_medias <- as.data.frame(tabela_medias)
 
