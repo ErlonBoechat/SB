@@ -6,7 +6,7 @@ source("calculations.R")
 source("visualizations.R")
 source("export.R")
 
-file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem29.txt"
+file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem31.txt"
 processor <- DataProcessor$new(file_path)
 dados <- processor$data
 dados <- dados %>%
@@ -17,10 +17,18 @@ dados <- dados %>%
 
 dados
 
+dados <- dados %>%
+  mutate(Perfil = rownames(dados))
+
+rownames(dados) <- NULL
+         
+
+print(colnames(dados))
+
 colunas_desejadas <- dados %>%
   select(Followers, Engagement.Rate,AVG.Likes, AVG.Comments,SUM.AVG.Engajament)
 
-dados <- dados[, -1]
+print(colnames(final_data))dados <- dados[, -1]
 
 rk_engagement <- dados %>%
   arrange(desc(Engagement.Rate))

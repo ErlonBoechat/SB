@@ -21,15 +21,12 @@ MetricsCalculator <- R6::R6Class("MetricsCalculator",
                                      self$data %>%
                                        group_by(Perfil) %>%
                                        summarise(
-                                         `Media Uploads` = mean(`Media Uploads`, na.rm = TRUE),
+                                         `Media.Uploads` = mean(`Media.Uploads`, na.rm = TRUE),
                                          `Followers` = mean(`Followers`, na.rm = TRUE),
                                          `Following` = mean(`Following`, na.rm = TRUE),
-                                         `Engagement Rate` = mean(`Engagement Rate`, na.rm = TRUE),
-                                         `AVG Likes` = mean(`AVG Likes`, na.rm = TRUE),
-                                         `AVG Comments` = mean(`AVG Comments`, na.rm = TRUE),
-                                         `Followers (30d)` = mean(`Followers (30d)`, na.rm = TRUE),
-                                         `Following (30d)` = mean(`Following (30d)`, na.rm = TRUE),
-                                         `Media (30d)` = mean(`Media (30d)`, na.rm = TRUE)
+                                         `Engagement.Rate` = mean(`Engagement.Rate`, na.rm = TRUE),
+                                         `AVG.Likes` = mean(`AVG.Likes`, na.rm = TRUE),
+                                         `AVG.Comments` = mean(`AVG.Comments`, na.rm = TRUE)
                                        )
                                    },
                                    

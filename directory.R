@@ -1,6 +1,7 @@
 library(dplyr)
 library(tidyverse)
 library(R6)
+library(lubridate)
 source("data_processing.R")
 source("calculations.R")
 source("visualizations.R")
@@ -11,7 +12,7 @@ dir_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/"
 
 # Especifique o intervalo de arquivos desejado
 start_file <- 25
-end_file   <- 29
+end_file   <- 31
 
 # Gere os nomes dos arquivos com base no padrão padronizado
 file_names <- paste0("raspagem", start_file:end_file, ".txt")
@@ -29,7 +30,6 @@ all_data <- all_data %>%
   mutate(SUM_AVG_Engajament = rowSums(select(., `AVG.Likes`, `AVG.Comments`), na.rm = TRUE)) %>%
   arrange(desc(SUM_AVG_Engajament))
 
-all_data
 
 # Para cada arquivo, processa e adiciona as colunas 'Perfil' e 'Arquivo'
 data_list <- lapply(file_paths, function(f) {
@@ -52,6 +52,56 @@ final_data <- dplyr::bind_rows(data_list)
 # Desloca a coluna Perfil para a esquerda do dataframe
 final_data <- final_data %>% select(Perfil, everything())
 
+date <- final_data$Date.Time
+
+
+final_data <- final_data %>%
+  mutate(Date.Time = dmy_hm(Date.Time))
+
+gera_tabela_medias <- function(final_data) {
+  # Converter a coluna Date.Time para objeto de data/hora
+
+  final_data <- final_data %>%
+    mutate(Date.Time = parse_date_time(Date.Time, orders = "HM dmy", tz = "America/Sao_Paulo"))
+  
+  # Agregar os dados por 'Perfil'
+  tabela <- final_data %>%
+    group_by(Perfil) %>%
+    reframe(
+      # Para estas colunas, pegar o valor da última atualização (linha com maior Date.Time)
+      `Media.Uploads` = `Media.Uploads`[which.max(Date.Time)],
+      Followers = Followers[which.max(Date.Time)],
+      Following = Following[which.max(Date.Time)],
+      
+      # Para as demais métricas, calcular a média dos valores
+      `Engagement.Rate` = mean(`Engagement.Rate`, na.rm = TRUE),
+      `AVG.Likes` = mean(`AVG.Likes`, na.rm = TRUE),
+      `AVG.Comments` = mean(`AVG.Comments`, na.rm = TRUE),
+      .groups = "drop"
+    )
+  return(tabela)
+}
+
+# Exemplo de uso:
+tabela_medias <- gera_tabela_medias(final_data)
+print(tabela_medias)
+
+df_tabela_medias <- as.data.frame(tabela_medias)
+
+df_tabela_medias <- df_tabela_medias %>%
+  mutate(across(where(is.numeric), ~format(.x, nsmall = 1)))
+
+
+
+
+
+
+
+
+
+
+sort_profile <- final_data %>%
+  arrange(desc(Perfil))
 
 
 all_data <- all_data %>%
@@ -65,7 +115,7 @@ all_data <- all_data %>%
 rm(list=ls())
 
 # Cálculo de métricas
-calculator <- MetricsCalculator$new(all_data)
+calculator <- MetricsCalculator$new(final_data)
 medias <- calculator$calcular_medias()
 variacoes <- calculator$calcular_variacoes()
 
