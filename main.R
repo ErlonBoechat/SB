@@ -6,7 +6,7 @@ source("calculations.R")
 source("visualizations.R")
 source("export.R")
 
-file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem31.txt"
+file_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/raspagem35.txt"
 processor <- DataProcessor$new(file_path)
 dados <- processor$data
 dados <- dados %>%

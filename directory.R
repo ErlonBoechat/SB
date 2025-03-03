@@ -11,8 +11,8 @@ source("export.R")
 dir_path <- "C:/Users/Erlon/OneDrive/dataLab/CORRIDA_GOV_2026/"
 
 # Especifique o intervalo de arquivos desejado
-start_file <- 25
-end_file   <- 31
+start_file <- 21
+end_file   <- 35
 
 # Gere os nomes dos arquivos com base no padrão padronizado
 file_names <- paste0("raspagem", start_file:end_file, ".txt")
@@ -24,6 +24,8 @@ all_data <- do.call(rbind, lapply(file_paths, function(f) {
   processor <- DataProcessor$new(f)
   processor$data
 }))
+
+warnings(all_data)
 
 # Exemplo de processamento adicional: cálculo de uma nova coluna (soma de AVG Likes e AVG Comments)
 all_data <- all_data %>%
@@ -51,6 +53,12 @@ data_list <- lapply(file_paths, function(f) {
 final_data <- dplyr::bind_rows(data_list)
 # Desloca a coluna Perfil para a esquerda do dataframe
 final_data <- final_data %>% select(Perfil, everything())
+
+linhas_finais <- final_data %>%
+  slice_tail(n = 97)
+
+
+print(final_data, n = Inf)
 
 gera_tabela_medias <- function(final_data) {
   # Converter a coluna Date.Time para objeto de data/hora
@@ -80,15 +88,29 @@ gera_tabela_medias <- function(final_data) {
 tabela_medias <- gera_tabela_medias(final_data)
 print(tabela_medias)
 
-
-tabela_medias <- tabela_medias %>%
+tabela_medias_ER <- tabela_medias %>%
   arrange(desc(Engagement.Rate))
 
+tabela_medias_Likes <- tabela_medias %>%
+  arrange(desc(AVG.Likes))
 
-print(tabela_medias, n = Inf)
+
+
+print(tabela_medias_ER, n = Inf)
+
+politicosES <- tabela_medias_ER %>%
+  filter(Perfil %in% c("@casagrande_es", "@arnaldinhoborgo", "@fabianocontarato",
+                       "@magnomalta","@lucaspolese","@ricardoferraco","@euclerio_sampaio",
+                       "@manato_es","@lorenzopazolini","@irinylopes"))
+
+imprensaES <- tabela_medias_Likes %>%
+  filter(Perfil %in% c("@danicariello","@folhavitoria","@michelbermudesauer","@michelitos79",
+                       "@agazetaes","@tvgazetaes","@eudanielacarla","@eltonribeirotv"))
 
 
 
+politicosEs <- tabela_medias_Likes[c(14, 16, 17,18,21,22,24,25,27,29,30), ]
+print(politicosEs, n = Inf)
 
 df_tabela_medias <- as.data.frame(tabela_medias)
 
